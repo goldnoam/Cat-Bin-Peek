@@ -45,6 +45,12 @@ const App: React.FC = () => {
   const timerRef = useRef<any>(null);
   const spawnRef = useRef<any>(null);
   const messageTimeoutRef = useRef<any>(null);
+  
+  // Power-up timers
+  const slowMoTimeoutRef = useRef<any>(null);
+  const frenzyTimeoutRef = useRef<any>(null);
+  const freezeTimeoutRef = useRef<any>(null);
+  const repellentTimeoutRef = useRef<any>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -80,6 +86,17 @@ const App: React.FC = () => {
     playSound('powerup', settings.isMuted);
     if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current);
     messageTimeoutRef.current = setTimeout(() => setActiveMessage(null), 2000);
+  };
+
+  const clearPowerups = () => {
+    setIsSlowMotion(false);
+    setIsFrenzy(false);
+    setIsFrozen(false);
+    setIsRepelled(false);
+    if (slowMoTimeoutRef.current) clearTimeout(slowMoTimeoutRef.current);
+    if (frenzyTimeoutRef.current) clearTimeout(frenzyTimeoutRef.current);
+    if (freezeTimeoutRef.current) clearTimeout(freezeTimeoutRef.current);
+    if (repellentTimeoutRef.current) clearTimeout(repellentTimeoutRef.current);
   };
 
   const saveHighScore = (name: string, score: number) => {
@@ -129,10 +146,7 @@ const App: React.FC = () => {
   };
 
   const startGame = (resetTotal = true) => {
-    setIsSlowMotion(false);
-    setIsFrenzy(false);
-    setIsFrozen(false);
-    setIsRepelled(false);
+    clearPowerups();
     setActiveMessage(null);
     playSound('click', settings.isMuted);
     
@@ -149,8 +163,6 @@ const App: React.FC = () => {
       initBins(4);
     } else {
       const nextLevel = settings.level + 1;
-      // Incrementing stage works now: nextLevel is updated correctly.
-      // Bin count increases every multiple of 3 stages: 1-3=4, 4-6=5, 7-9=6...
       const newBinCount = 4 + Math.floor((nextLevel - 1) / 3);
       const newSpeed = Math.max(1500 - (nextLevel * 50), 400);
       
@@ -161,7 +173,6 @@ const App: React.FC = () => {
         totalBins: newBinCount,
         speed: newSpeed
       }));
-      // Lives do not reset every stage, they persist. 
       initBins(newBinCount);
     }
     setStatus(GameStatus.PLAYING);
@@ -292,11 +303,42 @@ const App: React.FC = () => {
       if (bin.catType === 'speedy') gain = 50;
       if (bin.catType === 'golden') gain = 150;
 
+      // Powerup Logic
       if (bin.catType.startsWith('powerup_')) {
-        showPowerupMessage("Power UP!");
+        const type = bin.catType;
+        if (type === 'powerup_slow') {
+          setIsSlowMotion(true);
+          showPowerupMessage(lang === 'he' ? "הילוך איטי!" : "Slow Motion!");
+          if (slowMoTimeoutRef.current) clearTimeout(slowMoTimeoutRef.current);
+          slowMoTimeoutRef.current = setTimeout(() => setIsSlowMotion(false), 10000); // 10s
+        } else if (type === 'powerup_frenzy') {
+          setIsFrenzy(true);
+          showPowerupMessage(lang === 'he' ? "שיגעון ניקוד! x3" : "Frenzy! x3 Score");
+          if (frenzyTimeoutRef.current) clearTimeout(frenzyTimeoutRef.current);
+          frenzyTimeoutRef.current = setTimeout(() => setIsFrenzy(false), 8000); // 8s
+        } else if (type === 'powerup_freeze') {
+          setIsFrozen(true);
+          showPowerupMessage(lang === 'he' ? "קפוא!" : "Frozen!");
+          if (freezeTimeoutRef.current) clearTimeout(freezeTimeoutRef.current);
+          freezeTimeoutRef.current = setTimeout(() => setIsFrozen(false), 5000); // 5s
+        } else if (type === 'powerup_clock') {
+          setSettings(s => ({ ...s, timeRemaining: s.timeRemaining + 10 }));
+          showPowerupMessage(lang === 'he' ? "+10 שניות" : "+10 Seconds");
+        } else if (type === 'powerup_broom') {
+          showPowerupMessage(lang === 'he' ? "טאטוא נקי!" : "Clean Sweep!");
+          gain = 100;
+          // Effect: all current bins close handled by the state return below
+          return currentBins.map(b => ({ ...b, isOpen: false, hasCat: false, hitsRemaining: 1 }));
+        } else if (type === 'powerup_repellent') {
+          setIsRepelled(true);
+          showPowerupMessage(lang === 'he' ? "דוחה חתולים!" : "Cat Repellent!");
+          if (repellentTimeoutRef.current) clearTimeout(repellentTimeoutRef.current);
+          repellentTimeoutRef.current = setTimeout(() => setIsRepelled(false), 5000); // 5s
+          return currentBins.map(b => ({ ...b, isOpen: false, hasCat: false, hitsRemaining: 1 }));
+        }
       }
 
-      setSettings(s => ({ ...s, score: s.score + (isFrenzy ? gain * 2 : gain) }));
+      setSettings(s => ({ ...s, score: s.score + (isFrenzy ? gain * 3 : gain) }));
       return currentBins.map(b => b.id === id ? { ...b, isOpen: false, hasCat: false, hitsRemaining: 1 } : b);
     });
   };
@@ -376,6 +418,13 @@ const App: React.FC = () => {
             onToggleMute={() => setSettings(s => ({ ...s, isMuted: !s.isMuted }))} 
             onPause={() => setStatus(GameStatus.PAUSED)} 
           />
+          
+          {activeMessage && (
+            <div className="fixed top-32 left-1/2 -translate-x-1/2 bg-yellow-400 text-black px-8 py-4 rounded-full font-black text-3xl shadow-2xl animate-bounce z-[60]">
+              {activeMessage}
+            </div>
+          )}
+
           <div className="mt-32 w-full max-w-4xl grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8 md:gap-12 place-items-center">
             {bins.map(bin => (
               <TrashBin 
