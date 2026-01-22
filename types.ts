@@ -20,7 +20,8 @@ export type CatType =
   | 'powerup_slow' 
   | 'powerup_frenzy'
   | 'powerup_freeze'
-  | 'powerup_repellent';
+  | 'powerup_repellent'
+  | 'powerup_life';
 
 export type BinVisualType = 
   | 'metal'

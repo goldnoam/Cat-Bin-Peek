@@ -68,7 +68,7 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, visual
       case 'high-tech':
         return {
           body: 'bg-slate-950 border-2 border-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.4),inset_0_0_15px_rgba(34,211,238,0.2)]',
-          lid: 'bg-slate-900 border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3),inset_0_0_10px_rgba(34,211,238,0.2)]',
+          lid: 'bg-slate-900 border-2 border-cyan-400 shadow-[0_0_15_rgba(34,211,238,0.3),inset_0_0_10px_rgba(34,211,238,0.2)]',
           handle: 'bg-cyan-400',
           pattern: 'pattern-hitech opacity-70',
           animOpen: 'lid-spring-hitech',
@@ -251,6 +251,12 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, visual
              <div className="relative">
                 <div className="absolute inset-0 bg-purple-500/40 blur-3xl rounded-full animate-burst"></div>
                 <span className="text-7xl md:text-9xl drop-shadow-[0_0_25px_rgba(147,51,234,1)] animate-bounce">🧴</span>
+           </div>
+           )}
+           {catType === 'powerup_life' && (
+             <div className="relative scale-110">
+                <div className="absolute inset-0 bg-red-500/40 blur-3xl rounded-full animate-burst"></div>
+                <span className="text-7xl md:text-9xl drop-shadow-[0_0_25px_rgba(239,68,68,1)] animate-float">❤️</span>
              </div>
            )}
         </div>

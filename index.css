@@ -24,6 +24,28 @@ body {
   @apply font-sans;
 }
 
+/* Environment Themes with Atmospheric Overlays */
+.theme-playground {
+  background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1519331379826-f10be5486c6f?q=80&w=2070&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+}
+.theme-city {
+  background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2144&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+}
+.theme-village {
+  background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1932&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+}
+.theme-beach {
+  background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+}
+
 /* Bin Lid Animation Timings */
 .lid-spring-metal { transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .lid-snap-metal { transition: all 0.25s cubic-bezier(0.36, 0, 0.66, -0.56); }

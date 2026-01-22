@@ -12,6 +12,8 @@ import { speak } from './services/ttsService';
 const LEVEL_DURATION = 30;
 const STORAGE_KEY = 'cat_bin_high_scores';
 
+type ThemeType = 'theme-playground' | 'theme-city' | 'theme-village' | 'theme-beach';
+
 const App: React.FC = () => {
   const [status, setStatus] = useState<GameStatus>(GameStatus.MENU);
   const [lang, setLang] = useState<Locale>('he');
@@ -19,6 +21,7 @@ const App: React.FC = () => {
   const [highContrast, setHighContrast] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [lives, setLives] = useState(5);
+  const [bgTheme, setBgTheme] = useState<ThemeType>('theme-playground');
   
   const t = translations[lang];
 
@@ -111,6 +114,12 @@ const App: React.FC = () => {
     setPlayerName('');
   };
 
+  const updateBackground = () => {
+    const themes: ThemeType[] = ['theme-playground', 'theme-city', 'theme-village', 'theme-beach'];
+    const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+    setBgTheme(randomTheme);
+  };
+
   const initBins = useCallback((count: number) => {
     const visualTypes: BinVisualType[] = ['metal', 'wooden', 'plastic-blue', 'plastic-green', 'rusty', 'high-tech', 'toxic-yellow', 'royal-purple'];
     const newBins: BinState[] = Array.from({ length: count }, (_, i) => ({
@@ -127,20 +136,21 @@ const App: React.FC = () => {
 
   const getRandomCatType = (level: number): CatType => {
     const roll = Math.random();
-    if (roll < 0.03) return 'powerup_broom';
-    if (roll < 0.06) return 'powerup_clock';
-    if (roll < 0.09) return 'powerup_slow';
-    if (roll < 0.12) return 'powerup_frenzy';
-    if (roll < 0.15) return 'powerup_freeze';
-    if (roll < 0.18) return 'powerup_repellent';
+    if (roll < 0.02) return 'powerup_life';
+    if (roll < 0.05) return 'powerup_broom';
+    if (roll < 0.08) return 'powerup_clock';
+    if (roll < 0.11) return 'powerup_slow';
+    if (roll < 0.14) return 'powerup_frenzy';
+    if (roll < 0.17) return 'powerup_freeze';
+    if (roll < 0.20) return 'powerup_repellent';
 
-    if (roll < 0.23 && level > 2) return 'golden';
-    if (roll < 0.31 && level > 1) return 'ninja';
-    if (roll < 0.38) return 'speedy';
-    if (roll < 0.45) return 'sticky';
-    if (roll < 0.55) return 'grumpy';
-    if (roll < 0.65) return 'sleepy';
-    if (roll < 0.80) return 'playful';
+    if (roll < 0.25 && level > 2) return 'golden';
+    if (roll < 0.33 && level > 1) return 'ninja';
+    if (roll < 0.40) return 'speedy';
+    if (roll < 0.47) return 'sticky';
+    if (roll < 0.57) return 'grumpy';
+    if (roll < 0.67) return 'sleepy';
+    if (roll < 0.82) return 'playful';
     return 'normal';
   };
 
@@ -159,6 +169,7 @@ const App: React.FC = () => {
         isMuted: settings.isMuted
       });
       setLives(5);
+      updateBackground();
       initBins(4);
     } else {
       const nextLevel = settings.level + 1;
@@ -172,6 +183,7 @@ const App: React.FC = () => {
         totalBins: newBinCount,
         speed: newSpeed
       }));
+      updateBackground();
       initBins(newBinCount);
     }
     setStatus(GameStatus.PLAYING);
@@ -305,7 +317,10 @@ const App: React.FC = () => {
       // Powerup Logic
       if (bin.catType.startsWith('powerup_')) {
         const type = bin.catType;
-        if (type === 'powerup_slow') {
+        if (type === 'powerup_life') {
+          setLives(prev => Math.min(prev + 1, 5));
+          showPowerupMessage(lang === 'he' ? "+חיים!" : "+Life!");
+        } else if (type === 'powerup_slow') {
           setIsSlowMotion(true);
           showPowerupMessage(lang === 'he' ? "הילוך איטי!" : "Slow Motion!");
           if (slowMoTimeoutRef.current) clearTimeout(slowMoTimeoutRef.current);
@@ -326,7 +341,6 @@ const App: React.FC = () => {
         } else if (type === 'powerup_broom') {
           showPowerupMessage(lang === 'he' ? "טאטוא נקי!" : "Clean Sweep!");
           gain = 100;
-          // Effect: all current bins close handled by the state return below
           return currentBins.map(b => ({ ...b, isOpen: false, hasCat: false, hitsRemaining: 1 }));
         } else if (type === 'powerup_repellent') {
           setIsRepelled(true);
@@ -344,14 +358,14 @@ const App: React.FC = () => {
 
   const getEnvColor = () => {
     if (highContrast) return 'bg-black';
-    if (theme === 'light') return 'bg-slate-100';
-    if (isSlowMotion) return 'bg-cyan-950/60';
-    if (isFrenzy) return 'bg-red-950/60';
-    return 'bg-gray-900';
+    if (status === GameStatus.MENU || status === GameStatus.PAUSED || status === GameStatus.GAME_OVER || status === GameStatus.LEVEL_WON) {
+      return theme === 'light' ? 'bg-slate-100' : 'bg-gray-900';
+    }
+    return bgTheme;
   };
 
   return (
-    <div className={`min-h-screen ${getEnvColor()} ${highContrast ? 'high-contrast' : ''} flex flex-col items-center justify-center p-4 font-sans select-none overflow-hidden transition-colors duration-700`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
+    <div className={`min-h-screen ${getEnvColor()} ${highContrast ? 'high-contrast' : ''} flex flex-col items-center justify-center p-4 font-sans select-none overflow-hidden transition-all duration-700`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
       
       <AccessibilityToolbar 
         currentLang={lang} setLang={setLang}
@@ -363,7 +377,7 @@ const App: React.FC = () => {
       />
 
       {status === GameStatus.MENU && (
-        <div className="flex flex-col items-center text-center max-w-md w-full animate-in fade-in zoom-in duration-500">
+        <div className="flex flex-col items-center text-center max-w-md w-full animate-in fade-in zoom-in duration-500 z-50">
           <div className="relative mb-8">
             <h1 className="text-7xl md:text-8xl font-black text-white dark:text-white tracking-tighter drop-shadow-2xl italic">
               {t.title.split(' ').map((word, i) => (
