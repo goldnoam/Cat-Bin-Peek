@@ -4,6 +4,11 @@
   "version": "1.1.0",
   "description": "Fast-paced arcade cat game",
   "main": "index.tsx",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
@@ -12,6 +17,11 @@
   "devDependencies": {
     "tailwindcss": "^3.4.1",
     "autoprefixer": "^10.4.17",
-    "postcss": "^8.4.35"
+    "postcss": "^8.4.35",
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.3.3",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18"
   }
 }
