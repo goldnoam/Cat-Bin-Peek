@@ -23,11 +23,20 @@ export type CatType =
   | 'powerup_freeze'
   | 'powerup_repellent';
 
+export type BinVisualType = 
+  | 'metal'
+  | 'wooden'
+  | 'plastic-blue'
+  | 'plastic-green'
+  | 'rusty'
+  | 'high-tech';
+
 export interface BinState {
   id: number;
   isOpen: boolean;
   hasCat: boolean;
   catType: CatType;
+  visualType: BinVisualType;
   spawnTime: number;
   hitsRemaining: number;
 }

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { GameStatus, BinState, GameSettings, HighScore, CatType } from './types';
+import { GameStatus, BinState, GameSettings, HighScore, CatType, BinVisualType } from './types';
 import HUD from './components/HUD';
 import TrashBin from './components/TrashBin';
 import AdPlaceholder from './components/AdPlaceholder';
@@ -19,6 +19,7 @@ const App: React.FC = () => {
   const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md');
   const [highContrast, setHighContrast] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [lives, setLives] = useState(5);
   
   const t = translations[lang];
 
@@ -60,8 +61,6 @@ const App: React.FC = () => {
     }
   }, [theme]);
 
-  // Fix: Sync the selected font size with the root document font size
-  // Tailwind uses 'rem' units which are relative to this root size.
   useEffect(() => {
     const root = document.documentElement;
     const sizeMap = {
@@ -97,8 +96,15 @@ const App: React.FC = () => {
   };
 
   const initBins = useCallback((count: number) => {
+    const visualTypes: BinVisualType[] = ['metal', 'wooden', 'plastic-blue', 'plastic-green', 'rusty', 'high-tech'];
     const newBins: BinState[] = Array.from({ length: count }, (_, i) => ({
-      id: i, isOpen: false, hasCat: false, catType: 'normal', spawnTime: 0, hitsRemaining: 1
+      id: i, 
+      isOpen: false, 
+      hasCat: false, 
+      catType: 'normal', 
+      visualType: visualTypes[Math.floor(Math.random() * visualTypes.length)],
+      spawnTime: 0, 
+      hitsRemaining: 1
     }));
     setBins(newBins);
   }, []);
@@ -131,12 +137,31 @@ const App: React.FC = () => {
     playSound('click', settings.isMuted);
     
     if (resetTotal) {
-      setSettings(prev => ({ ...prev, level: 1, score: 0, timeRemaining: LEVEL_DURATION, totalBins: 4, speed: 1500 }));
+      setSettings({
+        level: 1,
+        score: 0,
+        timeRemaining: LEVEL_DURATION,
+        totalBins: 4,
+        speed: 1500,
+        isMuted: settings.isMuted
+      });
+      setLives(5);
       initBins(4);
     } else {
-      const newBinCount = Math.min(settings.level + 3, 12);
-      const newSpeed = Math.max(1500 - (settings.level * 100), 400);
-      setSettings(prev => ({ ...prev, timeRemaining: LEVEL_DURATION, totalBins: newBinCount, speed: newSpeed }));
+      const nextLevel = settings.level + 1;
+      // Incrementing stage works now: nextLevel is updated correctly.
+      // Bin count increases every multiple of 3 stages: 1-3=4, 4-6=5, 7-9=6...
+      const newBinCount = 4 + Math.floor((nextLevel - 1) / 3);
+      const newSpeed = Math.max(1500 - (nextLevel * 50), 400);
+      
+      setSettings(prev => ({
+        ...prev,
+        level: nextLevel,
+        timeRemaining: LEVEL_DURATION,
+        totalBins: newBinCount,
+        speed: newSpeed
+      }));
+      // Lives do not reset every stage, they persist. 
       initBins(newBinCount);
     }
     setStatus(GameStatus.PLAYING);
@@ -146,7 +171,10 @@ const App: React.FC = () => {
     if (status === GameStatus.PLAYING) {
       timerRef.current = setInterval(() => {
         setSettings(prev => {
-          if (prev.timeRemaining <= 1) { clearInterval(timerRef.current!); return { ...prev, timeRemaining: 0 }; }
+          if (prev.timeRemaining <= 1) { 
+            clearInterval(timerRef.current!); 
+            return { ...prev, timeRemaining: 0 }; 
+          }
           return { ...prev, timeRemaining: prev.timeRemaining - 1 };
         });
       }, 1000);
@@ -202,25 +230,39 @@ const App: React.FC = () => {
       const now = Date.now();
       const effectiveBaseSpeed = isSlowMotion ? settings.speed * 3 : settings.speed;
 
-      setBins(currentBins => currentBins.map(bin => {
-        if (!bin.isOpen) return bin;
-        if (isRepelled) return { ...bin, isOpen: false, hasCat: false, hitsRemaining: 1 };
+      setBins(currentBins => {
+        let changed = false;
+        const nextBins = currentBins.map(bin => {
+          if (!bin.isOpen) return bin;
+          if (isRepelled) return { ...bin, isOpen: false, hasCat: false, hitsRemaining: 1 };
 
-        let mult = 1.5;
-        if (bin.catType === 'ninja') mult = 0.6;
-        if (bin.catType === 'speedy') mult = 0.4;
-        if (bin.catType === 'sleepy') mult = 3.5;
-        if (bin.catType === 'sticky') mult = 2.5;
+          let mult = 1.5;
+          if (bin.catType === 'ninja') mult = 0.6;
+          if (bin.catType === 'speedy') mult = 0.4;
+          if (bin.catType === 'sleepy') mult = 3.5;
+          if (bin.catType === 'sticky') mult = 2.5;
 
-        if (now - bin.spawnTime > (effectiveBaseSpeed * mult)) {
-          if (bin.catType === 'ninja') playSound('exit_ninja', settings.isMuted);
-          else if (bin.catType === 'speedy') playSound('exit_speedy', settings.isMuted);
-          else playSound('exit_generic', settings.isMuted);
+          if (now - bin.spawnTime > (effectiveBaseSpeed * mult)) {
+            changed = true;
+            // User failed to close the bin - Lose a life if it's a cat
+            if (!bin.catType.startsWith('powerup_')) {
+              setLives(prevLives => {
+                const newLives = prevLives - 1;
+                if (newLives <= 0) setStatus(GameStatus.GAME_OVER);
+                return newLives;
+              });
+            }
 
-          return { ...bin, isOpen: false, hasCat: false, hitsRemaining: 1 };
-        }
-        return bin;
-      }));
+            if (bin.catType === 'ninja') playSound('exit_ninja', settings.isMuted);
+            else if (bin.catType === 'speedy') playSound('exit_speedy', settings.isMuted);
+            else playSound('exit_generic', settings.isMuted);
+
+            return { ...bin, isOpen: false, hasCat: false, hitsRemaining: 1 };
+          }
+          return bin;
+        });
+        return changed ? nextBins : currentBins;
+      });
     }, 200);
     return () => clearInterval(autoClose);
   }, [status, settings.speed, isSlowMotion, isRepelled, settings.isMuted]);
@@ -236,11 +278,14 @@ const App: React.FC = () => {
   const handleBinClick = (id: number) => {
     if (status !== GameStatus.PLAYING) return;
     setBins(currentBins => {
-      const bin = currentBins.find(b => b.id === id);
+      const binIndex = currentBins.findIndex(b => b.id === id);
+      const bin = currentBins[binIndex];
       if (!bin || !bin.isOpen) return currentBins;
 
       playSound('hit', settings.isMuted);
-      if (bin.hitsRemaining > 1) return currentBins.map(b => b.id === id ? { ...b, hitsRemaining: b.hitsRemaining - 1 } : b);
+      if (bin.hitsRemaining > 1) {
+        return currentBins.map(b => b.id === id ? { ...b, hitsRemaining: b.hitsRemaining - 1 } : b);
+      }
 
       let gain = 10;
       if (bin.catType === 'ninja') gain = 40;
@@ -323,6 +368,7 @@ const App: React.FC = () => {
             score={settings.score} 
             timeRemaining={settings.timeRemaining} 
             level={settings.level} 
+            lives={lives}
             isMuted={settings.isMuted} 
             isFrenzy={isFrenzy}
             isSlowMotion={isSlowMotion}
@@ -335,7 +381,7 @@ const App: React.FC = () => {
               <TrashBin 
                 key={bin.id}
                 id={bin.id} isOpen={bin.isOpen} hasCat={bin.hasCat} 
-                catType={bin.catType} spawnTime={bin.spawnTime} hitsRemaining={bin.hitsRemaining} 
+                catType={bin.catType} visualType={bin.visualType} spawnTime={bin.spawnTime} hitsRemaining={bin.hitsRemaining} 
                 isSlowMotion={isSlowMotion} onClick={() => handleBinClick(bin.id)} 
               />
             ))}
@@ -366,11 +412,15 @@ const App: React.FC = () => {
       {status === GameStatus.LEVEL_WON && (
         <div className="fixed inset-0 bg-gray-950 z-[100] flex flex-col items-center justify-center p-8 text-center overflow-y-auto">
           <h2 className="text-6xl font-black text-blue-400 mb-2">{t.levelWon}</h2>
+          <p className="text-2xl text-gray-400 mb-4">{lang === 'he' ? `השלמת את שלב ${settings.level}!` : `You completed Stage ${settings.level}!`}</p>
           <p className="text-3xl text-white font-bold mb-8">{t.score}: <span className="text-yellow-400">{settings.score}</span></p>
           <div className="bg-gray-900/80 p-10 rounded-[2.5rem] mb-10 border-2 border-blue-500/30 max-w-md italic shadow-2xl">
             <p className="text-gray-100 text-2xl font-medium leading-relaxed">"{flavorText}"</p>
           </div>
-          <button onClick={() => startGame(false)} className="py-7 px-12 bg-blue-500 hover:bg-blue-400 text-white text-3xl font-black rounded-3xl transition-all shadow-[0_10px_0_rgb(30,64,175)] active:translate-y-2">{t.nextLevel}</button>
+          <div className="flex flex-col gap-4 w-full max-w-sm">
+            <button onClick={() => startGame(false)} className="py-7 px-12 bg-blue-500 hover:bg-blue-400 text-white text-3xl font-black rounded-3xl transition-all shadow-[0_10px_0_rgb(30,64,175)] active:translate-y-2">{t.nextLevel}</button>
+            <button onClick={() => setStatus(GameStatus.MENU)} className="py-5 bg-red-600 text-white text-xl font-bold rounded-3xl active:scale-95">{t.quit}</button>
+          </div>
         </div>
       )}
 

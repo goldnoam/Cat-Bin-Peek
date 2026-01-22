@@ -1,10 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
+import { Volume2, VolumeX, Maximize, Minimize } from 'lucide-react';
 
 interface HUDProps {
   score: number;
   timeRemaining: number;
   level: number;
+  lives: number;
   isMuted: boolean;
   isFrenzy: boolean;
   isSlowMotion: boolean;
@@ -17,6 +19,7 @@ const HUD: React.FC<HUDProps> = ({
   score, 
   timeRemaining, 
   level, 
+  lives,
   isMuted, 
   isFrenzy, 
   isSlowMotion, 
@@ -55,11 +58,7 @@ const HUD: React.FC<HUDProps> = ({
             className="p-2 bg-gray-800 hover:bg-gray-700 rounded-full transition-all text-gray-300 hover:text-white border border-gray-700 shadow-sm active:scale-90"
             title={isMuted ? "Unmute" : "Mute"}
           >
-            {isMuted ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/></svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-            )}
+            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
           </button>
 
           <button 
@@ -67,16 +66,16 @@ const HUD: React.FC<HUDProps> = ({
             className="p-2 bg-gray-800 hover:bg-gray-700 rounded-full transition-all text-gray-300 hover:text-white border border-gray-700 shadow-sm active:scale-90"
             title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
           >
-            {isFullscreen ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
-            )}
+            {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
           </button>
 
           <div className="flex flex-col ml-1">
-            <span className="text-[10px] uppercase text-gray-500 font-bold tracking-widest">Score</span>
-            <span className="text-xl md:text-2xl font-black text-yellow-400 tabular-nums leading-none">{score}</span>
+            <span className="text-[10px] uppercase text-gray-500 font-bold tracking-widest">Lives</span>
+            <div className="flex gap-0.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <span key={i} className={`text-sm ${i < lives ? 'opacity-100' : 'opacity-20'}`}>❤️</span>
+              ))}
+            </div>
           </div>
         </div>
         
@@ -88,6 +87,10 @@ const HUD: React.FC<HUDProps> = ({
         </div>
 
         <div className="flex items-center gap-3">
+          <div className="flex flex-col text-right mr-2">
+            <span className="text-[10px] uppercase text-gray-500 font-bold tracking-widest">Score</span>
+            <span className="text-xl md:text-2xl font-black text-yellow-400 leading-none">{score}</span>
+          </div>
           <div className="flex flex-col text-right">
             <span className="text-[10px] uppercase text-gray-500 font-bold tracking-widest">Level</span>
             <span className="text-xl md:text-2xl font-black text-blue-400 leading-none">{level}</span>
@@ -96,7 +99,10 @@ const HUD: React.FC<HUDProps> = ({
             onClick={onPause}
             className="p-3 bg-blue-600 hover:bg-blue-500 rounded-xl transition-all shadow-lg active:scale-90 border border-blue-400/30"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><rect width="4" height="16" x="6" y="4"/><rect width="4" height="16" x="14" y="4"/></svg>
+            <div className="flex gap-1">
+              <div className="w-1 h-4 bg-white rounded-full"></div>
+              <div className="w-1 h-4 bg-white rounded-full"></div>
+            </div>
           </button>
         </div>
       </div>

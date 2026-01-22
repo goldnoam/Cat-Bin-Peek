@@ -1,18 +1,19 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { CatType } from '../types';
+import { CatType, BinVisualType } from '../types';
 
 interface TrashBinProps {
   id: number;
   isOpen: boolean;
   hasCat: boolean;
   catType: CatType;
+  visualType: BinVisualType;
   spawnTime: number;
   hitsRemaining: number;
   isSlowMotion: boolean;
   onClick: () => void;
 }
 
-const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnTime, hitsRemaining, isSlowMotion, onClick }) => {
+const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, visualType, spawnTime, hitsRemaining, isSlowMotion, onClick }) => {
   const seed = useMemo(() => id + spawnTime, [id, spawnTime]);
   const [isVisuallyExiting, setIsVisuallyExiting] = useState(false);
 
@@ -26,11 +27,71 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnT
     }
   }, [isOpen, hasCat]);
 
+  const binTheme = useMemo(() => {
+    switch (visualType) {
+      case 'wooden':
+        return {
+          body: 'bg-amber-800 border-amber-950',
+          lid: 'bg-amber-700 border-amber-900',
+          handle: 'bg-amber-950',
+          pattern: 'pattern-wood opacity-30',
+          animOpen: 'lid-spring-wooden',
+          animClose: 'lid-snap-wooden'
+        };
+      case 'plastic-blue':
+        return {
+          body: 'bg-blue-600 border-blue-800',
+          lid: 'bg-blue-500 border-blue-700',
+          handle: 'bg-blue-900',
+          pattern: 'opacity-10',
+          animOpen: 'lid-spring-plastic',
+          animClose: 'lid-snap-plastic'
+        };
+      case 'plastic-green':
+        return {
+          body: 'bg-emerald-600 border-emerald-800',
+          lid: 'bg-emerald-500 border-emerald-700',
+          handle: 'bg-emerald-900',
+          pattern: 'opacity-10',
+          animOpen: 'lid-spring-plastic',
+          animClose: 'lid-snap-plastic'
+        };
+      case 'rusty':
+        return {
+          body: 'bg-orange-900 border-amber-950',
+          lid: 'bg-orange-800 border-amber-900',
+          handle: 'bg-black',
+          pattern: 'pattern-rusty opacity-50',
+          animOpen: 'lid-spring-metal',
+          animClose: 'lid-snap-metal'
+        };
+      case 'high-tech':
+        return {
+          body: 'bg-slate-900 border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.5)]',
+          lid: 'bg-slate-800 border-cyan-400',
+          handle: 'bg-cyan-500',
+          pattern: 'pattern-hitech opacity-40',
+          animOpen: 'lid-spring-hitech',
+          animClose: 'lid-snap-hitech'
+        };
+      case 'metal':
+      default:
+        return {
+          body: 'bg-slate-500 border-slate-700',
+          lid: 'bg-slate-400 border-slate-600',
+          handle: 'bg-slate-600',
+          pattern: 'pattern-metal opacity-70',
+          animOpen: 'lid-spring-metal',
+          animClose: 'lid-snap-metal'
+        };
+    }
+  }, [visualType]);
+
   const catVisuals = useMemo(() => {
     const normalVariants = ['🐱', '🐈', '🐈‍⬛', '😻', '😸', '😼', '😺', '🐾', '🦁', '🐯'];
-    const grumpyVariants = ['😾', '😿', '🙀', '👹', '😤', '😡'];
-    const sleepyVariants = ['😽', '😴', '🥱', '💤', '🛌', '🌙'];
-    const playfulVariants = ['😺', '😻', '😹', '🌈', '🤪', '😜'];
+    const grumpyVariants = ['😾', '😤', '😠', '😡', '🤬', '🗯️', '💢'];
+    const sleepyVariants = ['😴', '🥱', '💤', '🛌', '🌙', '🌃', '😽'];
+    const playfulVariants = ['😸', '😹', '😻', '🤪', '😜', '🤡', '🌈'];
     
     const foodAccessories = ['🐟', '🥛', '🍪', '🍗', '🥨'];
     const toyAccessories = ['🧶', '🐭', '🦋', '⚽', '🎈', '🎀'];
@@ -74,7 +135,7 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnT
       case 'grumpy':
         base = { ...base,
           emoji: getVariant(grumpyVariants),
-          accessory: getVariant(['💢', '🌩️', '💀', '🔥']),
+          accessory: getVariant(['💢', '🌩️', '🔥', '🌋', '🧨', '🗯️', '💀']),
           aura: 'bg-red-600/30',
           animation: 'animate-wiggle',
           entryAnimation: 'animate-bounce',
@@ -85,7 +146,7 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnT
       case 'sleepy':
         base = { ...base,
           emoji: getVariant(sleepyVariants),
-          accessory: getVariant(['💤', '🌙', '🛌', '☁️']),
+          accessory: getVariant(['💤', '☁️', '🧸', '🥛', '🌙', '🛌', '✨']),
           aura: 'bg-blue-400/20',
           animation: 'opacity-80',
           entryAnimation: 'animate-daze',
@@ -96,7 +157,7 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnT
       case 'playful':
         base = { ...base,
           emoji: getVariant(playfulVariants),
-          accessory: getVariant(['🧶', '🐁', '🦋', '⚽', '🎾']),
+          accessory: getVariant(['🧶', '🐭', '🦋', '🎈', '🍭', '✨', '⚽', '🎾']),
           aura: 'bg-green-400/20',
           animation: 'animate-bounce [animation-duration:1s]',
           exitAnimation: 'animate-exit-sink',
@@ -207,7 +268,7 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnT
              </div>
            )}
            {catVisuals.accessory && (
-             <span className={`absolute ${catType === 'sleepy' ? '-top-6 -right-4' : '-top-4 -right-4'} text-3xl drop-shadow-md`}>
+             <span className={`absolute ${catType === 'sleepy' ? '-top-6 -right-4' : '-top-4 -right-4'} text-3xl drop-shadow-md select-none`}>
                {catVisuals.accessory}
              </span>
            )}
@@ -224,27 +285,43 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnT
   return (
     <div 
       onClick={onClick}
-      className={`relative w-24 h-24 md:w-32 md:h-32 cursor-pointer transition-transform active:scale-90 flex items-end justify-center group`}
+      className={`relative w-24 h-24 md:w-32 md:h-32 cursor-pointer active:scale-95 flex items-end justify-center group`}
     >
-      <div className={`absolute bottom-0 w-full h-3/4 bg-slate-500 rounded-b-2xl border-b-[10px] border-slate-700 shadow-2xl z-20 overflow-hidden ${catType === 'sticky' && isOpen ? 'ring-4 ring-green-500 ring-inset animate-pulse' : ''} ${isOpen && hasCat ? 'animate-spin-very-slow' : ''}`}>
-        <div className="w-full h-full bg-gradient-to-t from-slate-600 to-transparent opacity-70" />
-        <div className="flex justify-around w-full px-4 mt-6 opacity-40">
-          <div className="w-2 h-16 bg-slate-900 rounded-full shadow-inner"></div>
-          <div className="w-2 h-16 bg-slate-900 rounded-full shadow-inner"></div>
-          <div className="w-2 h-16 bg-slate-900 rounded-full shadow-inner"></div>
+      {/* Bin Body */}
+      <div className={`absolute bottom-0 w-full h-3/4 ${binTheme.body} rounded-b-2xl border-b-[10px] shadow-2xl z-20 overflow-hidden ${catType === 'sticky' && isOpen ? 'ring-4 ring-green-500 ring-inset animate-pulse' : ''} ${isOpen && hasCat ? 'animate-spin-very-slow' : ''}`}>
+        {/* Pattern Layer */}
+        <div className={`absolute inset-0 ${binTheme.pattern} z-0`} />
+        
+        {/* Gradient/Shade Layer */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-10" />
+        
+        <div className="relative flex justify-around w-full px-4 mt-6 opacity-40 z-20">
+          <div className={`w-2 h-16 ${binTheme.handle} rounded-full shadow-inner`}></div>
+          <div className={`w-2 h-16 ${binTheme.handle} rounded-full shadow-inner`}></div>
+          <div className={`w-2 h-16 ${binTheme.handle} rounded-full shadow-inner`}></div>
         </div>
+        
+        {visualType === 'high-tech' && (
+          <div className="absolute top-2 left-0 w-full flex justify-center gap-1 z-30">
+             <div className="w-1 h-1 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_5px_cyan]"></div>
+             <div className="w-1 h-1 bg-cyan-400 rounded-full animate-pulse delay-75 shadow-[0_0_5px_cyan]"></div>
+             <div className="w-1 h-1 bg-cyan-400 rounded-full animate-pulse delay-150 shadow-[0_0_5px_cyan]"></div>
+          </div>
+        )}
       </div>
 
+      {/* The Occupant (Cat or Powerup) */}
       <div className={`absolute bottom-6 w-full h-full z-10 flex items-center justify-center`}>
         {renderOccupant()}
       </div>
 
+      {/* Bin Lid */}
       <div 
-        className={`absolute top-0 w-full h-1/4 bg-slate-400 rounded-t-3xl border-t-4 border-slate-200 shadow-2xl z-30 transition-all duration-500 origin-bottom-left ${
-          isOpen ? '-translate-y-20 -rotate-45 scale-110' : 'translate-y-6'
+        className={`absolute top-0 w-full h-1/4 ${binTheme.lid} rounded-t-3xl border-t-4 shadow-2xl z-30 origin-bottom-left ${
+          isOpen ? binTheme.animOpen + ' -translate-y-20 -rotate-45 scale-110' : binTheme.animClose + ' translate-y-6'
         }`}
       >
-        <div className="w-12 h-4 bg-slate-600 mx-auto rounded-full mt-2 border-b-2 border-slate-800" />
+        <div className={`w-12 h-4 ${binTheme.handle} mx-auto rounded-full mt-2 border-b-2 border-black/20`} />
       </div>
     </div>
   );
