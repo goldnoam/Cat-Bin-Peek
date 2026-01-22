@@ -4,155 +4,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Cat Bin Peek</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      @keyframes spin-slow {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-      .animate-spin-slow {
-        animation: spin-slow 8s linear infinite;
-      }
-
-      @keyframes spin-very-slow {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-      .animate-spin-very-slow {
-        animation: spin-very-slow 15s linear infinite;
-      }
-      
-      @keyframes smoke {
-        0% { transform: scale(0.5); opacity: 0; }
-        20% { opacity: 0.8; }
-        100% { transform: scale(3.5); opacity: 0; }
-      }
-      .animate-smoke {
-        animation: smoke 0.6s ease-out forwards;
-      }
-
-      @keyframes burst {
-        0% { transform: scale(0); opacity: 1; }
-        100% { transform: scale(3); opacity: 0; }
-      }
-      .animate-burst {
-        animation: burst 0.5s ease-out forwards;
-      }
-
-      @keyframes float {
-        0%, 100% { transform: translateY(0) rotate(0deg); }
-        50% { transform: translateY(-12px) rotate(5deg); }
-      }
-      .animate-float {
-        animation: float 2.5s ease-in-out infinite;
-      }
-
-      @keyframes sparkle {
-        0%, 100% { opacity: 0; transform: scale(0); }
-        50% { opacity: 1; transform: scale(1.2); }
-      }
-      .animate-sparkle {
-        animation: sparkle 1.5s ease-in-out infinite;
-      }
-
-      @keyframes wiggle {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-3px); }
-        75% { transform: translateX(3px); }
-      }
-      .animate-wiggle {
-        animation: wiggle 0.2s ease-in-out infinite;
-      }
-
-      @keyframes sprint {
-        0% { transform: translateX(-18px) skewX(-25deg); filter: blur(4px); opacity: 0.7; }
-        25% { transform: translateX(0px) skewX(0deg); filter: blur(0px); opacity: 1; }
-        50% { transform: translateX(18px) skewX(25deg); filter: blur(4px); opacity: 0.7; }
-        75% { transform: translateX(0px) skewX(0deg); filter: blur(0px); opacity: 1; }
-        100% { transform: translateX(-18px) skewX(-25deg); filter: blur(4px); opacity: 0.7; }
-      }
-      .animate-sprint {
-        animation: sprint 0.1s infinite linear;
-      }
-
-      @keyframes trail {
-        0% { opacity: 0.5; transform: scale(1); }
-        100% { opacity: 0; transform: scale(1.5) translateX(-40px); }
-      }
-      .animate-trail {
-        animation: trail 0.3s infinite linear;
-      }
-
-      /* Entry Animations */
-      @keyframes pop-ninja {
-        0% { transform: scale(0) translateY(40px); filter: blur(10px); }
-        50% { transform: scale(1.2) translateY(-10px); filter: blur(0); }
-        100% { transform: scale(1) translateY(0); }
-      }
-      .animate-pop-ninja { animation: pop-ninja 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-
-      @keyframes pop-sticky {
-        0% { transform: scaleY(0.5) translateY(40px); }
-        100% { transform: scaleY(1) translateY(0); }
-      }
-      .animate-pop-sticky { animation: pop-sticky 0.8s cubic-bezier(0.47, 0, 0.745, 0.715); }
-
-      @keyframes pop-speedy {
-        0% { transform: translateX(-100px) scaleX(2); opacity: 0; }
-        100% { transform: translateX(0) scaleX(1); opacity: 1; }
-      }
-      .animate-pop-speedy { animation: pop-speedy 0.2s ease-out; }
-
-      /* Exit Animations */
-      @keyframes exit-teleport {
-        0% { transform: scale(1); opacity: 1; filter: brightness(3); }
-        100% { transform: scale(0); opacity: 0; filter: brightness(10); }
-      }
-      .animate-exit-teleport { animation: exit-teleport 0.3s ease-in forwards; }
-
-      @keyframes exit-dash {
-        0% { transform: translateX(0) skewX(0); opacity: 1; }
-        100% { transform: translateX(300px) skewX(45deg); opacity: 0; }
-      }
-      .animate-exit-dash { animation: exit-dash 0.3s cubic-bezier(0.45, 0, 0.55, 1) forwards; }
-
-      @keyframes exit-fade-slow {
-        0% { opacity: 1; filter: blur(0); }
-        100% { opacity: 0; filter: blur(10px); }
-      }
-      .animate-exit-fade-slow { animation: exit-fade-slow 0.8s ease-out forwards; }
-
-      @keyframes exit-sink {
-        0% { transform: translateY(0); opacity: 1; }
-        100% { transform: translateY(100px); opacity: 0; }
-      }
-      .animate-exit-sink { animation: exit-sink 0.4s ease-in forwards; }
-
-      .bg-gradient-conic {
-        background: conic-gradient(var(--tw-gradient-stops));
-      }
-      
-      .pop-out {
-        transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
-      }
-
-      /* RTL specific tweaks */
-      [dir="rtl"] .ltr-only { display: none; }
-    </style>
+    
+    <!-- SEO Meta Tags -->
+    <title>Cat Bin Peek - Fast Arcade Fun</title>
+    <meta name="description" content="Stop the cats from jumping out of the trash bins! A fast-paced arcade game available in multiple languages. (C) Noam Gold AI 2026" />
+    <meta name="keywords" content="game, cats, arcade, offline game, cat bin peek, noam gold" />
+    <meta name="author" content="Noam Gold AI" />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Cat Bin Peek" />
+    <meta property="og:description" content="Catch those pesky cats in this fun arcade game!" />
+    <meta property="og:type" content="website" />
+    
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="index.css" />
+    
+    <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0274741291001288" crossorigin="anonymous"></script>
-  <script type="importmap">
-{
-  "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "@google/genai": "https://esm.sh/@google/genai@^1.38.0"
-  }
-}
-</script>
-</head>
-  <body class="bg-gray-900 text-white overflow-hidden touch-none select-none">
+
+    <script type="importmap">
+    {
+      "imports": {
+        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+        "react/": "https://esm.sh/react@^19.2.3/",
+        "react": "https://esm.sh/react@^19.2.3",
+        "lucide-react": "https://esm.sh/lucide-react@0.446.0"
+      }
+    }
+    </script>
+  </head>
+  <body class="bg-gray-900 text-white overflow-x-hidden touch-none select-none">
     <div id="root"></div>
+    <script type="module" src="index.tsx"></script>
   </body>
 </html>

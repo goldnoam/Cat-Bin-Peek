@@ -1,0 +1,30 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-size-base: 16px;
+}
+
+body {
+  font-size: var(--font-size-base);
+  @apply bg-gray-900 text-white selection:bg-yellow-400 selection:text-black;
+}
+
+.font-size-sm { --font-size-base: 14px; }
+.font-size-md { --font-size-base: 16px; }
+.font-size-lg { --font-size-base: 20px; }
+
+.high-contrast {
+  @apply grayscale contrast-125;
+}
+
+.high-contrast * {
+  @apply border-white text-white bg-black !important;
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  @apply font-sans;
+}
