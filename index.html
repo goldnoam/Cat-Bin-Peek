@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Cat Bin Peek</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @keyframes spin-slow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .animate-spin-slow {
+        animation: spin-slow 8s linear infinite;
+      }
+
+      @keyframes spin-very-slow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .animate-spin-very-slow {
+        animation: spin-very-slow 15s linear infinite;
+      }
+      
+      @keyframes smoke {
+        0% { transform: scale(0.5); opacity: 0; }
+        20% { opacity: 0.8; }
+        100% { transform: scale(3.5); opacity: 0; }
+      }
+      .animate-smoke {
+        animation: smoke 0.6s ease-out forwards;
+      }
+
+      @keyframes burst {
+        0% { transform: scale(0); opacity: 1; }
+        100% { transform: scale(3); opacity: 0; }
+      }
+      .animate-burst {
+        animation: burst 0.5s ease-out forwards;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-12px) rotate(5deg); }
+      }
+      .animate-float {
+        animation: float 2.5s ease-in-out infinite;
+      }
+
+      @keyframes sparkle {
+        0%, 100% { opacity: 0; transform: scale(0); }
+        50% { opacity: 1; transform: scale(1.2); }
+      }
+      .animate-sparkle {
+        animation: sparkle 1.5s ease-in-out infinite;
+      }
+
+      @keyframes wiggle {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-3px); }
+        75% { transform: translateX(3px); }
+      }
+      .animate-wiggle {
+        animation: wiggle 0.2s ease-in-out infinite;
+      }
+
+      @keyframes sprint {
+        0% { transform: translateX(-18px) skewX(-25deg); filter: blur(4px); opacity: 0.7; }
+        25% { transform: translateX(0px) skewX(0deg); filter: blur(0px); opacity: 1; }
+        50% { transform: translateX(18px) skewX(25deg); filter: blur(4px); opacity: 0.7; }
+        75% { transform: translateX(0px) skewX(0deg); filter: blur(0px); opacity: 1; }
+        100% { transform: translateX(-18px) skewX(-25deg); filter: blur(4px); opacity: 0.7; }
+      }
+      .animate-sprint {
+        animation: sprint 0.1s infinite linear;
+      }
+
+      @keyframes trail {
+        0% { opacity: 0.5; transform: scale(1); }
+        100% { opacity: 0; transform: scale(1.5) translateX(-40px); }
+      }
+      .animate-trail {
+        animation: trail 0.3s infinite linear;
+      }
+
+      /* Unique Entry Animations */
+      @keyframes pop-ninja {
+        0% { transform: scale(0) translateY(40px); filter: blur(10px); }
+        50% { transform: scale(1.2) translateY(-10px); filter: blur(0); }
+        100% { transform: scale(1) translateY(0); }
+      }
+      .animate-pop-ninja { animation: pop-ninja 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+      @keyframes pop-sticky {
+        0% { transform: scaleY(0.5) translateY(40px); }
+        100% { transform: scaleY(1) translateY(0); }
+      }
+      .animate-pop-sticky { animation: pop-sticky 0.8s cubic-bezier(0.47, 0, 0.745, 0.715); }
+
+      @keyframes pop-speedy {
+        0% { transform: translateX(-100px) scaleX(2); opacity: 0; }
+        100% { transform: translateX(0) scaleX(1); opacity: 1; }
+      }
+      .animate-pop-speedy { animation: pop-speedy 0.2s ease-out; }
+
+      .bg-gradient-conic {
+        background: conic-gradient(var(--tw-gradient-stops));
+      }
+      
+      .pop-out {
+        transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      /* RTL specific tweaks if needed */
+      [dir="rtl"] .ltr-only { display: none; }
+    </style>
+    <!-- Google AdSense Placeholder - Replace 'YOUR_CLIENT_ID' with actual ID -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_CLIENT_ID" crossorigin="anonymous"></script>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-gray-900 text-white overflow-hidden touch-none select-none">
+    <div id="root"></div>
+  </body>
+</html>

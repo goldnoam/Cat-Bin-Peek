@@ -1,0 +1,5 @@
+{
+  "name": "Cat Bin Peek",
+  "description": "A fast-paced arcade game where you must close trash bins before pesky cats jump out. Features dynamic levels, increasing difficulty, and mobile-friendly controls.",
+  "requestFramePermissions": []
+}
