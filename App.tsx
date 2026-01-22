@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GameStatus, BinState, GameSettings, HighScore, CatType, BinVisualType } from './types';
 import HUD from './components/HUD';
@@ -113,7 +112,7 @@ const App: React.FC = () => {
   };
 
   const initBins = useCallback((count: number) => {
-    const visualTypes: BinVisualType[] = ['metal', 'wooden', 'plastic-blue', 'plastic-green', 'rusty', 'high-tech'];
+    const visualTypes: BinVisualType[] = ['metal', 'wooden', 'plastic-blue', 'plastic-green', 'rusty', 'high-tech', 'toxic-yellow', 'royal-purple'];
     const newBins: BinState[] = Array.from({ length: count }, (_, i) => ({
       id: i, 
       isOpen: false, 

@@ -1,4 +1,3 @@
-
 export enum GameStatus {
   MENU = 'MENU',
   PLAYING = 'PLAYING',
@@ -29,7 +28,9 @@ export type BinVisualType =
   | 'plastic-blue'
   | 'plastic-green'
   | 'rusty'
-  | 'high-tech';
+  | 'high-tech'
+  | 'toxic-yellow'
+  | 'royal-purple';
 
 export interface BinState {
   id: number;

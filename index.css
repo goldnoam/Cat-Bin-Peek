@@ -60,6 +60,15 @@ body {
   background-size: 12px 12px, 12px 12px, 100% 4px;
 }
 
+.pattern-toxic {
+  background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 10px, transparent 10px, transparent 20px);
+}
+
+.pattern-royal {
+  background-image: radial-gradient(circle at 50% 50%, rgba(255,215,0,0.1) 0%, transparent 50%);
+  background-size: 20px 20px;
+}
+
 /* Custom Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0); }

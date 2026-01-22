@@ -67,12 +67,30 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, visual
         };
       case 'high-tech':
         return {
-          body: 'bg-slate-950 border-2 border-cyan-500 shadow-[0_0_25px_rgba(6,182,212,0.4),inset_0_0_15px_rgba(6,182,212,0.2)]',
+          body: 'bg-slate-950 border-2 border-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.4),inset_0_0_15px_rgba(34,211,238,0.2)]',
           lid: 'bg-slate-900 border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3),inset_0_0_10px_rgba(34,211,238,0.2)]',
           handle: 'bg-cyan-400',
-          pattern: 'pattern-hitech opacity-60',
+          pattern: 'pattern-hitech opacity-70',
           animOpen: 'lid-spring-hitech',
           animClose: 'lid-snap-hitech'
+        };
+      case 'toxic-yellow':
+        return {
+          body: 'bg-yellow-500 border-yellow-700',
+          lid: 'bg-yellow-400 border-yellow-600',
+          handle: 'bg-gray-900',
+          pattern: 'pattern-toxic opacity-40',
+          animOpen: 'lid-spring-plastic',
+          animClose: 'lid-snap-plastic'
+        };
+      case 'royal-purple':
+        return {
+          body: 'bg-purple-900 border-purple-950',
+          lid: 'bg-purple-800 border-purple-950',
+          handle: 'bg-yellow-500',
+          pattern: 'pattern-royal opacity-30',
+          animOpen: 'lid-spring-wooden',
+          animClose: 'lid-snap-wooden'
         };
       case 'metal':
       default:
