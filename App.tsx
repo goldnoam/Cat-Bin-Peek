@@ -49,7 +49,6 @@ const App: React.FC = () => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) setHighScores(JSON.parse(saved));
     setFlavorText(t.encouragement);
-    // Set dark theme by default
     document.documentElement.classList.add('dark');
   }, []);
 
@@ -60,6 +59,18 @@ const App: React.FC = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [theme]);
+
+  // Fix: Sync the selected font size with the root document font size
+  // Tailwind uses 'rem' units which are relative to this root size.
+  useEffect(() => {
+    const root = document.documentElement;
+    const sizeMap = {
+      sm: '14px',
+      md: '16px',
+      lg: '20px'
+    };
+    root.style.fontSize = sizeMap[fontSize];
+  }, [fontSize]);
 
   const handleTTS = (text: string) => {
     if (!settings.isMuted) speak(text, lang);
@@ -79,7 +90,6 @@ const App: React.FC = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   };
 
-  // Fix for error: Cannot find name 'submitScore'
   const submitScore = () => {
     saveHighScore(playerName, settings.score);
     setStatus(GameStatus.MENU);
@@ -92,6 +102,25 @@ const App: React.FC = () => {
     }));
     setBins(newBins);
   }, []);
+
+  const getRandomCatType = (level: number): CatType => {
+    const roll = Math.random();
+    if (roll < 0.03) return 'powerup_broom';
+    if (roll < 0.06) return 'powerup_clock';
+    if (roll < 0.09) return 'powerup_slow';
+    if (roll < 0.12) return 'powerup_frenzy';
+    if (roll < 0.15) return 'powerup_freeze';
+    if (roll < 0.18) return 'powerup_repellent';
+
+    if (roll < 0.23 && level > 2) return 'golden';
+    if (roll < 0.31 && level > 1) return 'ninja';
+    if (roll < 0.38) return 'speedy';
+    if (roll < 0.45) return 'sticky';
+    if (roll < 0.55) return 'grumpy';
+    if (roll < 0.65) return 'sleepy';
+    if (roll < 0.80) return 'playful';
+    return 'normal';
+  };
 
   const startGame = (resetTotal = true) => {
     setIsSlowMotion(false);
@@ -113,10 +142,6 @@ const App: React.FC = () => {
     setStatus(GameStatus.PLAYING);
   };
 
-  const resetGame = () => {
-    startGame(true);
-  };
-
   useEffect(() => {
     if (status === GameStatus.PLAYING) {
       timerRef.current = setInterval(() => {
@@ -130,6 +155,75 @@ const App: React.FC = () => {
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [status]);
+
+  useEffect(() => {
+    if (status === GameStatus.PLAYING) {
+      const effectiveSpeed = isSlowMotion ? settings.speed * 2.2 : settings.speed;
+      spawnRef.current = setInterval(() => {
+        if (isFrozen || isRepelled) return;
+
+        setBins(currentBins => {
+          const closedIndices = currentBins.map((b, i) => b.isOpen ? -1 : i).filter(i => i !== -1);
+          if (closedIndices.length === 0) return currentBins;
+          
+          const countToOpen = Math.min(Math.floor(settings.level / 3) + 1, 3);
+          const nextBins = [...currentBins];
+          for (let i = 0; i < countToOpen; i++) {
+            if (closedIndices.length === 0) break;
+            const binIdx = closedIndices.splice(Math.floor(Math.random() * closedIndices.length), 1)[0];
+            const catType = getRandomCatType(settings.level);
+            
+            if (catType === 'ninja') playSound('spawn_ninja', settings.isMuted);
+            else if (catType === 'golden') playSound('spawn_golden', settings.isMuted);
+            else if (catType === 'speedy') playSound('spawn_speedy', settings.isMuted);
+            else playSound('spawn_normal', settings.isMuted);
+
+            nextBins[binIdx] = { 
+              ...nextBins[binIdx], 
+              isOpen: true, 
+              hasCat: true, 
+              catType, 
+              spawnTime: Date.now(), 
+              hitsRemaining: catType === 'sticky' ? 2 : 1 
+            };
+          }
+          return nextBins;
+        });
+      }, effectiveSpeed);
+    } else {
+      if (spawnRef.current) clearInterval(spawnRef.current);
+    }
+    return () => { if (spawnRef.current) clearInterval(spawnRef.current); };
+  }, [status, settings.speed, settings.level, isSlowMotion, isFrozen, isRepelled, settings.isMuted]);
+
+  useEffect(() => {
+    const autoClose = setInterval(() => {
+      if (status !== GameStatus.PLAYING) return;
+      const now = Date.now();
+      const effectiveBaseSpeed = isSlowMotion ? settings.speed * 3 : settings.speed;
+
+      setBins(currentBins => currentBins.map(bin => {
+        if (!bin.isOpen) return bin;
+        if (isRepelled) return { ...bin, isOpen: false, hasCat: false, hitsRemaining: 1 };
+
+        let mult = 1.5;
+        if (bin.catType === 'ninja') mult = 0.6;
+        if (bin.catType === 'speedy') mult = 0.4;
+        if (bin.catType === 'sleepy') mult = 3.5;
+        if (bin.catType === 'sticky') mult = 2.5;
+
+        if (now - bin.spawnTime > (effectiveBaseSpeed * mult)) {
+          if (bin.catType === 'ninja') playSound('exit_ninja', settings.isMuted);
+          else if (bin.catType === 'speedy') playSound('exit_speedy', settings.isMuted);
+          else playSound('exit_generic', settings.isMuted);
+
+          return { ...bin, isOpen: false, hasCat: false, hitsRemaining: 1 };
+        }
+        return bin;
+      }));
+    }, 200);
+    return () => clearInterval(autoClose);
+  }, [status, settings.speed, isSlowMotion, isRepelled, settings.isMuted]);
 
   useEffect(() => {
     if (settings.timeRemaining === 0 && status === GameStatus.PLAYING) {
@@ -171,13 +265,15 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen ${getEnvColor()} ${highContrast ? 'high-contrast' : ''} font-size-${fontSize} flex flex-col items-center justify-center p-4 font-sans select-none overflow-hidden transition-colors duration-700`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
+    <div className={`min-h-screen ${getEnvColor()} ${highContrast ? 'high-contrast' : ''} flex flex-col items-center justify-center p-4 font-sans select-none overflow-hidden transition-colors duration-700`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
       
       <AccessibilityToolbar 
         currentLang={lang} setLang={setLang}
         fontSize={fontSize} setFontSize={setFontSize}
         highContrast={highContrast} setHighContrast={setHighContrast}
         theme={theme} setTheme={setTheme}
+        isMuted={settings.isMuted}
+        setIsMuted={(muted) => setSettings(s => ({ ...s, isMuted: muted }))}
       />
 
       {status === GameStatus.MENU && (
@@ -245,14 +341,13 @@ const App: React.FC = () => {
             ))}
           </div>
 
-          {/* Virtual WASD for mobile movement simulation/selection */}
           <div className="fixed bottom-24 right-4 grid grid-cols-3 gap-1 md:hidden opacity-50">
             <div />
-            <button onTouchStart={() => {/* Simulate W */}} className="w-12 h-12 bg-gray-700 text-white rounded-lg flex items-center justify-center font-bold">W</button>
+            <button className="w-12 h-12 bg-gray-700 text-white rounded-lg flex items-center justify-center font-bold">W</button>
             <div />
-            <button onTouchStart={() => {/* Simulate A */}} className="w-12 h-12 bg-gray-700 text-white rounded-lg flex items-center justify-center font-bold">A</button>
-            <button onTouchStart={() => {/* Simulate S */}} className="w-12 h-12 bg-gray-700 text-white rounded-lg flex items-center justify-center font-bold">S</button>
-            <button onTouchStart={() => {/* Simulate D */}} className="w-12 h-12 bg-gray-700 text-white rounded-lg flex items-center justify-center font-bold">D</button>
+            <button className="w-12 h-12 bg-gray-700 text-white rounded-lg flex items-center justify-center font-bold">A</button>
+            <button className="w-12 h-12 bg-gray-700 text-white rounded-lg flex items-center justify-center font-bold">S</button>
+            <button className="w-12 h-12 bg-gray-700 text-white rounded-lg flex items-center justify-center font-bold">D</button>
           </div>
         </>
       )}
@@ -262,7 +357,7 @@ const App: React.FC = () => {
           <h2 className="text-6xl font-black text-white mb-10">{t.paused}</h2>
           <div className="flex flex-col gap-5 w-full max-w-xs">
             <button onClick={() => setStatus(GameStatus.PLAYING)} className="py-6 bg-yellow-400 text-black text-2xl font-black rounded-3xl active:scale-95">{t.resume}</button>
-            <button onClick={resetGame} className="py-5 bg-blue-600 text-white text-xl font-bold rounded-3xl active:scale-95">Reset Level</button>
+            <button onClick={() => startGame(true)} className="py-5 bg-blue-600 text-white text-xl font-bold rounded-3xl active:scale-95">Reset Level</button>
             <button onClick={() => setStatus(GameStatus.MENU)} className="py-5 bg-red-600 text-white text-xl font-bold rounded-3xl opacity-80">{t.quit}</button>
           </div>
         </div>
@@ -322,7 +417,6 @@ const App: React.FC = () => {
         </div>
       )}
       
-      {/* Footer information */}
       <footer className="fixed bottom-0 left-0 w-full p-2 flex justify-center gap-4 text-[10px] text-gray-500 pointer-events-none">
         <span>{t.copyright}</span>
         <span>{t.feedback}: goldnoamai@gmail.com</span>

@@ -4,17 +4,13 @@
 @tailwind utilities;
 
 :root {
-  --font-size-base: 16px;
+  /* This will be updated dynamically via JS */
+  font-size: 16px;
 }
 
 body {
-  font-size: var(--font-size-base);
   @apply bg-gray-900 text-white selection:bg-yellow-400 selection:text-black;
 }
-
-.font-size-sm { --font-size-base: 14px; }
-.font-size-md { --font-size-base: 16px; }
-.font-size-lg { --font-size-base: 20px; }
 
 .high-contrast {
   @apply grayscale contrast-125;
@@ -27,4 +23,91 @@ body {
 /* RTL Support */
 [dir="rtl"] {
   @apply font-sans;
+}
+
+/* Custom Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes smoke {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 0.5; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes trail {
+  0% { transform: translateX(-20px); opacity: 0.5; }
+  100% { transform: translateX(20px); opacity: 0; }
+}
+
+@keyframes pop-speedy {
+  0% { transform: scale(0) translateY(20px); }
+  50% { transform: scale(1.2) translateY(-5px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes pop-sticky {
+  0% { transform: scale(0.5) translateY(40px); }
+  60% { transform: scale(1.1) translateY(-10px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes pop-ninja {
+  0% { transform: scale(0); filter: blur(10px); }
+  100% { transform: scale(1); filter: blur(0); }
+}
+
+@keyframes daze {
+  0% { filter: blur(4px); opacity: 0; transform: scale(0.9) translateY(10px); }
+  100% { filter: blur(0); opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes exit-sink {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(50px); opacity: 0; }
+}
+
+@keyframes exit-dash {
+  0% { transform: translateX(0) skewX(0); opacity: 1; }
+  100% { transform: translateX(100px) skewX(-20deg); opacity: 0; }
+}
+
+@keyframes exit-teleport {
+  0% { transform: scale(1); filter: brightness(2); }
+  100% { transform: scale(0); filter: brightness(5); }
+}
+
+@keyframes exit-fade-slow {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.9); }
+}
+
+@keyframes burst {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.animate-pop-speedy { animation: pop-speedy 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.animate-pop-sticky { animation: pop-sticky 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+.animate-pop-ninja { animation: pop-ninja 0.3s ease-out forwards; }
+.animate-daze { animation: daze 1.2s ease-out forwards; }
+.animate-exit-sink { animation: exit-sink 0.4s ease-in forwards; }
+.animate-exit-dash { animation: exit-dash 0.2s ease-in forwards; }
+.animate-exit-teleport { animation: exit-teleport 0.2s ease-in forwards; }
+.animate-exit-fade-slow { animation: exit-fade-slow 1s ease-in forwards; }
+.animate-smoke { animation: smoke 0.6s ease-out forwards; }
+.animate-trail { animation: trail 0.3s linear infinite; }
+.animate-burst { animation: burst 0.5s ease-out forwards; }
+.animate-spin-slow { animation: spin 8s linear infinite; }
+.animate-spin-very-slow { animation: spin 20s linear infinite; }
+
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-sprint { animation: float 0.5s ease-in-out infinite; }
+.animate-wiggle { animation: wiggle 0.3s ease-in-out infinite; }
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
 }

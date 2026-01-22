@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Locale, translations } from '../locales';
-import { Settings, Type, Languages, Contrast, Moon, Sun } from 'lucide-react';
+import { Settings, Type, Languages, Contrast, Moon, Sun, Volume2, VolumeX } from 'lucide-react';
 
 interface AccessibilityToolbarProps {
   currentLang: Locale;
@@ -12,10 +12,12 @@ interface AccessibilityToolbarProps {
   setHighContrast: (val: boolean) => void;
   theme: 'dark' | 'light';
   setTheme: (theme: 'dark' | 'light') => void;
+  isMuted: boolean;
+  setIsMuted: (val: boolean) => void;
 }
 
 const AccessibilityToolbar: React.FC<AccessibilityToolbarProps> = ({
-  currentLang, setLang, fontSize, setFontSize, highContrast, setHighContrast, theme, setTheme
+  currentLang, setLang, fontSize, setFontSize, highContrast, setHighContrast, theme, setTheme, isMuted, setIsMuted
 }) => {
   const languages: Locale[] = ['en', 'he', 'zh', 'hi', 'de', 'es', 'fr'];
 
@@ -27,6 +29,19 @@ const AccessibilityToolbar: React.FC<AccessibilityToolbarProps> = ({
         </button>
         
         <div className="absolute bottom-full left-0 mb-2 p-4 bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col gap-4 min-w-[200px]">
+          {/* Mute Toggle */}
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-gray-400 flex items-center gap-1">
+              {isMuted ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />} MUTE
+            </label>
+            <button 
+              onClick={() => setIsMuted(!isMuted)}
+              className={`w-10 h-5 rounded-full relative transition-colors ${isMuted ? 'bg-yellow-400' : 'bg-gray-600'}`}
+            >
+              <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${isMuted ? 'right-0.5' : 'left-0.5'}`} />
+            </button>
+          </div>
+
           {/* Theme Switcher */}
           <div className="flex flex-col gap-2">
             <label className="text-xs font-bold text-gray-400 flex items-center gap-1">

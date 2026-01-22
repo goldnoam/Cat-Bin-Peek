@@ -30,17 +30,17 @@ export const playSound = (type: string, isMuted: boolean) => {
       osc.stop(now + 0.1);
       break;
     case 'spawn_ninja':
-      // Whisper-like sound
+      // Distinct whisper-like sound using high-frequency sine and quick decay
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(800, now);
-      osc.frequency.exponentialRampToValueAtTime(1200, now + 0.3);
-      gain.gain.setValueAtTime(0.05, now);
-      gain.gain.linearRampToValueAtTime(0, now + 0.3);
+      osc.frequency.setValueAtTime(1500, now);
+      osc.frequency.exponentialRampToValueAtTime(2000, now + 0.2);
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.2);
       osc.start(now);
-      osc.stop(now + 0.3);
+      osc.stop(now + 0.2);
       break;
     case 'spawn_golden':
-      // "Meow" - High to low tone
+      // Sparkling meow
       osc.type = 'sine';
       osc.frequency.setValueAtTime(880, now);
       osc.frequency.exponentialRampToValueAtTime(440, now + 0.4);
@@ -59,23 +59,22 @@ export const playSound = (type: string, isMuted: boolean) => {
       osc.stop(now + 0.1);
       break;
     case 'exit_ninja':
-      // Teleport poof
-      const bufferSize = ctx.sampleRate * 0.1;
+      // Teleport poof sound with noise
+      const bufferSize = ctx.sampleRate * 0.15;
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
       const noise = ctx.createBufferSource();
       noise.buffer = buffer;
       const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.15, now);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+      noiseGain.gain.setValueAtTime(0.1, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
       noise.connect(noiseGain);
       noiseGain.connect(ctx.destination);
       noise.start(now);
-      noise.stop(now + 0.1);
+      noise.stop(now + 0.15);
       break;
     case 'exit_speedy':
-      // Dash away
       osc.type = 'square';
       osc.frequency.setValueAtTime(800, now);
       osc.frequency.linearRampToValueAtTime(2000, now + 0.15);

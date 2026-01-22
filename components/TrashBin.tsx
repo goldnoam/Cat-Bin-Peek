@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState, useEffect } from 'react';
 import { CatType } from '../types';
 
@@ -29,15 +28,12 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnT
 
   const catVisuals = useMemo(() => {
     const normalVariants = ['🐱', '🐈', '🐈‍⬛', '😻', '😸', '😼', '😺', '🐾', '🦁', '🐯'];
-    const grumpyVariants = ['😾', '😿', '🙀', '👹'];
-    const sleepyVariants = ['😽', '😴', '🥱', '💤'];
-    const playfulVariants = ['😺', '😻', '😹', '🌈'];
-    const speedyVariants = ['🐈‍💨', '🐆', '⚡', '🛸'];
-    const stickyVariants = ['🐸', '🍯', '🕸️', '🧟'];
+    const grumpyVariants = ['😾', '😿', '🙀', '👹', '😤', '😡'];
+    const sleepyVariants = ['😽', '😴', '🥱', '💤', '🛌', '🌙'];
+    const playfulVariants = ['😺', '😻', '😹', '🌈', '🤪', '😜'];
     
     const foodAccessories = ['🐟', '🥛', '🍪', '🍗', '🥨'];
     const toyAccessories = ['🧶', '🐭', '🦋', '⚽', '🎈', '🎀'];
-    const rareAccessories = ['💎', '🎩', '🕶️', '🍀'];
     const allRandomAccessories = [...foodAccessories, ...toyAccessories, '🦴'];
 
     const getVariant = (arr: string[]) => arr[seed % arr.length];
@@ -56,7 +52,7 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnT
     switch (catType) {
       case 'speedy':
         base = { ...base,
-          emoji: getVariant(speedyVariants),
+          emoji: getVariant(['🐈‍💨', '🐆', '⚡', '🛸']),
           accessory: '💨',
           aura: 'bg-cyan-400/40',
           animation: 'animate-sprint',
@@ -78,7 +74,7 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnT
       case 'grumpy':
         base = { ...base,
           emoji: getVariant(grumpyVariants),
-          accessory: '💢',
+          accessory: getVariant(['💢', '🌩️', '💀', '🔥']),
           aura: 'bg-red-600/30',
           animation: 'animate-wiggle',
           entryAnimation: 'animate-bounce',
@@ -89,10 +85,10 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnT
       case 'sleepy':
         base = { ...base,
           emoji: getVariant(sleepyVariants),
-          accessory: '💤',
+          accessory: getVariant(['💤', '🌙', '🛌', '☁️']),
           aura: 'bg-blue-400/20',
           animation: 'opacity-80',
-          entryAnimation: 'animate-in fade-in duration-1000',
+          entryAnimation: 'animate-daze',
           exitAnimation: 'animate-exit-fade-slow',
           glow: 'rgba(59,130,246,0.6)'
         };
@@ -100,6 +96,7 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnT
       case 'playful':
         base = { ...base,
           emoji: getVariant(playfulVariants),
+          accessory: getVariant(['🧶', '🐁', '🦋', '⚽', '🎾']),
           aura: 'bg-green-400/20',
           animation: 'animate-bounce [animation-duration:1s]',
           exitAnimation: 'animate-exit-sink',
@@ -190,6 +187,11 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnT
           <div className="absolute inset-0 bg-cyan-300/40 blur-3xl rounded-full animate-pulse z-0"></div>
         )}
         
+        {/* Entrance FX (Smoke for Ninja) */}
+        {isOpen && catType === 'ninja' && (
+          <div className="absolute w-20 h-20 bg-gray-400/50 rounded-full animate-smoke pointer-events-none z-10"></div>
+        )}
+
         <div className={`relative flex flex-col items-center ${catVisuals.animation} ${isSlowMotion ? 'brightness-125' : ''}`}>
            {catType === 'speedy' && (
              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
@@ -209,9 +211,9 @@ const TrashBin: React.FC<TrashBinProps> = ({ id, isOpen, hasCat, catType, spawnT
                {catVisuals.accessory}
              </span>
            )}
-           {catType === 'ninja' && (
+           {catType === 'ninja' && !isOpen && (
              <div className="absolute inset-0 flex items-center justify-center">
-               <div className="w-20 h-20 bg-gray-500/40 rounded-full animate-smoke pointer-events-none"></div>
+               <div className="w-16 h-16 bg-gray-500/20 rounded-full animate-smoke pointer-events-none"></div>
              </div>
            )}
         </div>
