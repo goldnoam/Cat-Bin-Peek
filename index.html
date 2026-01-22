@@ -84,7 +84,7 @@
         animation: trail 0.3s infinite linear;
       }
 
-      /* Unique Entry Animations */
+      /* Entry Animations */
       @keyframes pop-ninja {
         0% { transform: scale(0) translateY(40px); filter: blur(10px); }
         50% { transform: scale(1.2) translateY(-10px); filter: blur(0); }
@@ -104,6 +104,31 @@
       }
       .animate-pop-speedy { animation: pop-speedy 0.2s ease-out; }
 
+      /* Exit Animations */
+      @keyframes exit-teleport {
+        0% { transform: scale(1); opacity: 1; filter: brightness(3); }
+        100% { transform: scale(0); opacity: 0; filter: brightness(10); }
+      }
+      .animate-exit-teleport { animation: exit-teleport 0.3s ease-in forwards; }
+
+      @keyframes exit-dash {
+        0% { transform: translateX(0) skewX(0); opacity: 1; }
+        100% { transform: translateX(300px) skewX(45deg); opacity: 0; }
+      }
+      .animate-exit-dash { animation: exit-dash 0.3s cubic-bezier(0.45, 0, 0.55, 1) forwards; }
+
+      @keyframes exit-fade-slow {
+        0% { opacity: 1; filter: blur(0); }
+        100% { opacity: 0; filter: blur(10px); }
+      }
+      .animate-exit-fade-slow { animation: exit-fade-slow 0.8s ease-out forwards; }
+
+      @keyframes exit-sink {
+        0% { transform: translateY(0); opacity: 1; }
+        100% { transform: translateY(100px); opacity: 0; }
+      }
+      .animate-exit-sink { animation: exit-sink 0.4s ease-in forwards; }
+
       .bg-gradient-conic {
         background: conic-gradient(var(--tw-gradient-stops));
       }
@@ -112,11 +137,10 @@
         transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
       }
 
-      /* RTL specific tweaks if needed */
+      /* RTL specific tweaks */
       [dir="rtl"] .ltr-only { display: none; }
     </style>
-    <!-- Google AdSense Placeholder - Replace 'YOUR_CLIENT_ID' with actual ID -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_CLIENT_ID" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0274741291001288" crossorigin="anonymous"></script>
   <script type="importmap">
 {
   "imports": {

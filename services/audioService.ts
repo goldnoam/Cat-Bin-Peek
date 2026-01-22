@@ -8,7 +8,7 @@ const getCtx = () => {
   return audioCtx;
 };
 
-export const playSound = (type: 'spawn' | 'hit' | 'powerup' | 'gameover' | 'click' | 'ninja', isMuted: boolean) => {
+export const playSound = (type: string, isMuted: boolean) => {
   if (isMuted) return;
   const ctx = getCtx();
   const osc = ctx.createOscillator();
@@ -20,14 +20,78 @@ export const playSound = (type: 'spawn' | 'hit' | 'powerup' | 'gameover' | 'clic
   const now = ctx.currentTime;
 
   switch (type) {
-    case 'spawn':
+    case 'spawn_normal':
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(200, now);
-      osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
       gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+      osc.start(now);
+      osc.stop(now + 0.1);
+      break;
+    case 'spawn_ninja':
+      // Whisper-like sound
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(1200, now + 0.3);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.3);
+      osc.start(now);
+      osc.stop(now + 0.3);
+      break;
+    case 'spawn_golden':
+      // "Meow" - High to low tone
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(440, now + 0.4);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+      osc.start(now);
+      osc.stop(now + 0.4);
+      break;
+    case 'spawn_speedy':
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, now);
+      osc.frequency.exponentialRampToValueAtTime(1000, now + 0.1);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+      osc.start(now);
+      osc.stop(now + 0.1);
+      break;
+    case 'exit_ninja':
+      // Teleport poof
+      const bufferSize = ctx.sampleRate * 0.1;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.15, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+      noise.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+      noise.start(now);
+      noise.stop(now + 0.1);
+      break;
+    case 'exit_speedy':
+      // Dash away
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.linearRampToValueAtTime(2000, now + 0.15);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.15);
       osc.start(now);
       osc.stop(now + 0.15);
+      break;
+    case 'exit_generic':
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.exponentialRampToValueAtTime(200, now + 0.2);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+      osc.start(now);
+      osc.stop(now + 0.2);
       break;
     case 'hit':
       osc.type = 'square';
@@ -37,28 +101,6 @@ export const playSound = (type: 'spawn' | 'hit' | 'powerup' | 'gameover' | 'clic
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
       osc.start(now);
       osc.stop(now + 0.1);
-      break;
-    case 'ninja':
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(100, now);
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.linearRampToValueAtTime(0, now + 0.3);
-      osc.start(now);
-      osc.stop(now + 0.3);
-      // Noise component for ninja poof
-      const bufferSize = ctx.sampleRate * 0.3;
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-      const noise = ctx.createBufferSource();
-      noise.buffer = buffer;
-      const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.1, now);
-      noiseGain.gain.linearRampToValueAtTime(0, now + 0.3);
-      noise.connect(noiseGain);
-      noiseGain.connect(ctx.destination);
-      noise.start(now);
-      noise.stop(now + 0.3);
       break;
     case 'powerup':
       osc.type = 'sine';

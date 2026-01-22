@@ -19,7 +19,9 @@ export type CatType =
   | 'powerup_broom' 
   | 'powerup_clock' 
   | 'powerup_slow' 
-  | 'powerup_frenzy';
+  | 'powerup_frenzy'
+  | 'powerup_freeze'
+  | 'powerup_repellent';
 
 export interface BinState {
   id: number;
